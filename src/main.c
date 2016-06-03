@@ -1,0 +1,116 @@
+/*
+ * main.c
+ * 
+ * Copyright 2016 Emma Davenport <Davenport.physics@gmail.com>
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
+ * 
+ * 
+ */
+
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+void Initialize();
+void InitializeArrays(FILE *fp);
+void HandleRuntimeArguments(int argc, char *argv[]);
+
+static int NumberOfAtoms = 0;
+
+static char Filename[256] = {'\0'};
+static char **Atoms = NULL;
+
+static double CubicBoxLength = 0.0f;
+static double **Coordinates = NULL;
+
+int main(int argc, char **argv)
+{
+	
+	if (argc > 1) {
+	
+		HandleRuntimeArguments(argc, argv);
+		
+	}
+	Initialize();
+	
+	
+	free(Atoms);
+	free(Coordinates);
+	
+	return 0;
+}
+
+void HandleRuntimeArguments(int argc, char **argv) {
+	
+	int i;
+	for (i = 1;i < argc;i++) {
+	
+		if (strcasecmp(argv[i], "-f") == 0 && (i+1) < argc) {
+	
+			strncpy(Filename, argv[i+1], 256);
+			
+		}
+		
+	}
+	
+}
+
+void Initialize() {
+
+	FILE *fp = fopen(Filename, "r");
+	
+	if (fp == NULL) {
+	
+		printf("File %s not found, please re-run the program\n", Filename);
+		exit(1);
+		
+	}
+	
+	fscanf(fp,"%d", &NumberOfAtoms);
+	fscanf(fp,"%lf", &CubicBoxLength);
+	
+	printf("Number of atoms = %d and Unknown Paramater = %lf", NumberOfAtoms, CubicBoxLength);
+	
+	InitializeArrays(fp);
+	
+	fclose(fp);
+
+}
+
+void InitializeArrays(FILE *fp) {
+	
+	Atoms = (char **)malloc(NumberOfAtoms * sizeof(char *));
+	Coordinates = (double **)malloc(NumberOfAtoms * sizeof(double *));
+	
+	int i;
+	for (i = 0;i < NumberOfAtoms;i++) {
+	
+		Atoms[i] = (char *)malloc(3 * sizeof(char));
+		Coordinates[i] = (double *)malloc(3 * sizeof(double));
+		
+	}
+	
+	for (i = 0;i < NumberOfAtoms;i++) {
+	
+		fscanf(fp, "%s %lf %lf %lf", Atoms[i], &(Coordinates[i][0]),&(Coordinates[i][1]),&(Coordinates[i][2]));
+		printf("Atom %d %s with coordinates = %lf %lf %lf\n", i+1, Atoms[i], Coordinates[i][0], Coordinates[i][1], Coordinates[i][2]);
+		
+	}
+	
+}
+
