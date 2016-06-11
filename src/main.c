@@ -30,11 +30,12 @@
 
 static int NumberOfAtoms = 0;
 
-static char Filename[BUFFER_LENGTH];
 static char **Atoms = NULL;
 
 static double CubicBoxLength = 0.0f;
 static double **Coordinates = NULL;
+
+static Input_Vars InputInstance;
 
 void ReadInputFile();
 void Initialize(int argc, char *argv[]);
@@ -69,11 +70,11 @@ void Initialize(int argc, char *argv[]) {
 	if (argc > 1)
 		HandleRuntimeArguments(argc, argv);
 
-	FILE *fp = fopen(Filename, "r");
+	FILE *fp = fopen(InputInstance.Filename, "r");
 	
 	if (fp == NULL) {
 	
-		printf("File %s not found, please re-run the program\n", Filename);
+		printf("File %s not found, please re-run the program\n", InputInstance.Filename);
 		exit(1);
 		
 	}
@@ -128,11 +129,11 @@ void HandleRuntimeArguments(int argc, char **argv) {
 	
 		if (strcasecmp(argv[i], "-f") == 0 && (i+1) < argc) {
 	
-			strncpy(Filename, argv[i+1], BUFFER_LENGTH);
+			strncpy(InputInstance.Filename, argv[i+1], BUFFER_LENGTH);
 			
 		} else if (strcasecmp(argv[i], "-debug") == 0) {
 		
-			Debug = TRUE;
+			InputInstance.Debug = TRUE;
 			
 		}
 		
@@ -201,7 +202,7 @@ void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
 	//If comment leads string, simply exit this function
 	if (CommentIndex == 0) {
 	
-		if (Debug == TRUE) {
+		if (InputInstance.Debug == TRUE) {
 		
 			printf("String %s has a # at the beginning of the string\n", stringbuffer);
 			
@@ -215,7 +216,7 @@ void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
 	
 		if (strncasecmp(input_arguments[i].string, stringbuffer, input_arguments[i].length) == 0) {
 		
-			if (Debug == TRUE)
+			if (InputInstance.Debug == TRUE)
 				printf("Found %s in INPUT file\n", input_arguments[i].string);
 				
 			input_arguments[i].Function(stringbuffer);
@@ -230,47 +231,117 @@ void Input_xyz_file(char stringbuffer[BUFFER_LENGTH]) {
 	
 	char *parameter = GetParameter(stringbuffer);
 	
-	strncpy(Filename, parameter, strlen(parameter));
+	strncpy(InputInstance.Filename, parameter, strlen(parameter));
 	
 }
 void Input_test_forces(char stringbuffer[BUFFER_LENGTH]) {
 	
 	char *parameter = GetParameter(stringbuffer);
 	
+	if (strcmp(parameter, ".FALSE.") == 0) {
+	
+		InputInstance.Test_Forces = FALSE;
+		
+	} else if (strcmp(parameter, ".TRUE.") == 0) {
+	
+		InputInstance.Test_Forces = TRUE;
+		
+	} else {
+	
+		printf("Error, inappropriate TEST_FORCES parameter specified\n");
+		printf("Defaulting TEST_FORCES to FALSE\n");
+		
+		InputInstance.Test_Forces = FALSE;
+		
+	}
+	
 }
 void Input_constant_temp(char stringbuffer[BUFFER_LENGTH]) {
 	
 	char *parameter = GetParameter(stringbuffer);
+	
+	if (strcmp(parameter, ".FALSE.") == 0) {
+	
+		InputInstance.Constant_Temperature = FALSE;
+		
+	} else if (strcmp(parameter, ".TRUE.") == 0) {
+	
+		InputInstance.Constant_Temperature = TRUE;
+		
+	} else {
+	
+		printf("Error, inappropriate CONSTANT_TEMPERATURE parameter specified\n");
+		printf("Defaulting CONSTANT_TEMPERATURE to FALSE\n");
+		
+		InputInstance.Constant_Temperature = FALSE;
+		
+	}
 	
 }
 void Input_tau(char stringbuffer[BUFFER_LENGTH]) {
 	
 	char *parameter = GetParameter(stringbuffer);
 	
+	if ((InputInstance.Tau = atof(parameter)) == 0.0) {
+	
+		printf("Tau set to 0.0\n Possible incorrect conversion\n");
+		
+	}
+	
 }
 void Input_nsteps(char stringbuffer[BUFFER_LENGTH]) {
 	
 	char *parameter = GetParameter(stringbuffer);
+	
+	if ((InputInstance.NTSTEPS = atoi(parameter)) == 0) {
+	
+		printf("NTSTEPS set to 0\n Possible incorrection conversion\n");
+		
+	}
 	
 }
 void Input_dt(char stringbuffer[BUFFER_LENGTH]) {
 
 	char *parameter = GetParameter(stringbuffer);
 	
+	if ((InputInstance.DT = atof(parameter)) == 0.0) {
+	
+		printf("DT set to 0.0\n Possible incorrection conversion\n");
+		
+	}
+	
 }
 void Input_temp(char stringbuffer[BUFFER_LENGTH]) {
 	
 	char *parameter = GetParameter(stringbuffer);
+	
+	if ((InputInstance.Temp = atof(parameter)) == 0.0) {
+	
+		printf("TEMP set to 0.0\n Possible incorrection conversion\n");
+		
+	}
 	
 }
 void Input_init_temp(char stringbuffer[BUFFER_LENGTH]) {
 	
 	char *parameter = GetParameter(stringbuffer);
 	
+	if ((InputInstance.Init_Temp = atof(parameter)) == 0.0) {
+	
+		printf("INIT_TEMP set to 0.0\n Possible incorrection conversion\n");
+		
+	}
+	
 }
 void Input_iprint(char stringbuffer[BUFFER_LENGTH]) {
 	
 	char *parameter = GetParameter(stringbuffer);
+	
+	if ((InputInstance.Iprint = atoi(parameter)) == 0) {
+	
+		printf("IPRINT set to 0\n Possible incorrection conversion\n");
+		
+	}
 	
 }
 

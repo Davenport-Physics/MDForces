@@ -22,5 +22,3 @@
  */
 
 #include "share.h"
-
-bool Debug = FALSE;

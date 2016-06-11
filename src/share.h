@@ -35,12 +35,6 @@ typedef struct {
 
 } String_T;
 
-typedef struct {
-	
-	char Filename;
-	
-} Input_Vars;
-
 typedef enum {
 
 	FALSE = 0,
@@ -48,7 +42,22 @@ typedef enum {
 	
 } bool;
 
-extern bool Debug;
+typedef struct {
+	
+	char Filename[BUFFER_LENGTH];
+	bool Test_Forces;
+	bool Constant_Temperature;
+	double Tau;
+	int NTSTEPS;
+	double DT;
+	double Temp;
+	double Init_Temp;
+	int Iprint;
+	
+	bool Debug;
+	
+	
+} Input_Vars;
 
 #endif
 
