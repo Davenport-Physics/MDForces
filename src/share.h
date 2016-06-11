@@ -24,13 +24,22 @@
 #ifndef SHARE_H
 #define SHARE_H
 
+#define BUFFER_LENGTH 256
+
 
 typedef struct {
 
 	char *string;
 	int length;
+	void (*Function)(char stringbuffer[BUFFER_LENGTH]);
 
 } String_T;
+
+typedef struct {
+	
+	char Filename;
+	
+} Input_Vars;
 
 typedef enum {
 

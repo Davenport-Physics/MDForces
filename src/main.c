@@ -28,8 +28,6 @@
 
 #include "share.h"
 
-#define BUFFER_LENGTH 256
-
 static int NumberOfAtoms = 0;
 
 static char Filename[BUFFER_LENGTH];
@@ -39,10 +37,12 @@ static double CubicBoxLength = 0.0f;
 static double **Coordinates = NULL;
 
 void ReadInputFile();
-void ParseInputString(char stringbuffer[BUFFER_LENGTH]);
 void Initialize(int argc, char *argv[]);
 void InitializeArrays(FILE *fp);
+
 void HandleRuntimeArguments(int argc, char *argv[]);
+void ParseInputString(char stringbuffer[BUFFER_LENGTH]);
+char *GetParameter(char stringbuffer[BUFFER_LENGTH]);
 
 int main(int argc, char **argv)
 {
@@ -53,6 +53,40 @@ int main(int argc, char **argv)
 	free(Coordinates);
 	
 	return 0;
+}
+/*
+
+	Attemps to initialize all of the necessary static variables needed for
+	this program to run correctly. Will exit safely if certain conditions
+	are not met that are necessary for the program to execute correctly.
+
+*/
+
+void Initialize(int argc, char *argv[]) {
+
+	ReadInputFile();
+
+	if (argc > 1)
+		HandleRuntimeArguments(argc, argv);
+
+	FILE *fp = fopen(Filename, "r");
+	
+	if (fp == NULL) {
+	
+		printf("File %s not found, please re-run the program\n", Filename);
+		exit(1);
+		
+	}
+	
+	fscanf(fp,"%d", &NumberOfAtoms);
+	fscanf(fp,"%lf", &CubicBoxLength);
+	
+	printf("Number of atoms = %d and Cubic Box Length = %lf", NumberOfAtoms, CubicBoxLength);
+	
+	InitializeArrays(fp);
+	
+	fclose(fp);
+
 }
 
 /*
@@ -108,41 +142,6 @@ void HandleRuntimeArguments(int argc, char **argv) {
 
 /*
 
-	Attemps to initialize all of the necessary static variables needed for
-	this program to run correctly. Will exit safely if certain conditions
-	are not met that are necessary for the program to execute correctly.
-
-*/
-
-void Initialize(int argc, char *argv[]) {
-
-	ReadInputFile();
-
-	if (argc > 1)
-		HandleRuntimeArguments(argc, argv);
-
-	FILE *fp = fopen(Filename, "r");
-	
-	if (fp == NULL) {
-	
-		printf("File %s not found, please re-run the program\n", Filename);
-		exit(1);
-		
-	}
-	
-	fscanf(fp,"%d", &NumberOfAtoms);
-	fscanf(fp,"%lf", &CubicBoxLength);
-	
-	printf("Number of atoms = %d and Cubic Box Length = %lf", NumberOfAtoms, CubicBoxLength);
-	
-	InitializeArrays(fp);
-	
-	fclose(fp);
-
-}
-
-/*
-
 	Initializes static pointers.
 
 */
@@ -169,16 +168,26 @@ void InitializeArrays(FILE *fp) {
 	
 }
 
+void Input_xyz_file(char stringbuffer[BUFFER_LENGTH]);
+void Input_test_forces(char stringbuffer[BUFFER_LENGTH]);
+void Input_constant_temp(char stringbuffer[BUFFER_LENGTH]);
+void Input_tau(char stringbuffer[BUFFER_LENGTH]);
+void Input_nsteps(char stringbuffer[BUFFER_LENGTH]);
+void Input_dt(char stringbuffer[BUFFER_LENGTH]);
+void Input_temp(char stringbuffer[BUFFER_LENGTH]);
+void Input_init_temp(char stringbuffer[BUFFER_LENGTH]);
+void Input_iprint(char stringbuffer[BUFFER_LENGTH]);
+
 static const String_T input_arguments[9] = {
-{"XYZ_FILE", 8},
-{"TEST_FORCES",11},
-{"CONSTANT_TEMPERATURE",20},
-{"TAU", 3},
-{"NTSTEPS", 7},
-{"DT", 2},
-{"TEMP", 4},
-{"INIT_TEMP", 9},
-{"IPRINT", 6}};
+{"XYZ_FILE",             8, &Input_xyz_file},
+{"TEST_FORCES",         11, &Input_test_forces},
+{"CONSTANT_TEMPERATURE",20, &Input_constant_temp},
+{"TAU",                  3, &Input_tau},
+{"NTSTEPS",              7, &Input_nsteps},
+{"DT",                   2, &Input_dt},
+{"TEMP",                 4, &Input_temp},
+{"INIT_TEMP",            9, &Input_init_temp},
+{"IPRINT",               6, &Input_iprint}};
 
 void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
 
@@ -190,8 +199,16 @@ void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
 	int CommentIndex = strcspn(stringbuffer, "#");
 	
 	//If comment leads string, simply exit this function
-	if (CommentIndex == 0)
+	if (CommentIndex == 0) {
+	
+		if (Debug == TRUE) {
+		
+			printf("String %s has a # at the beginning of the string\n", stringbuffer);
+			
+		}
 		return;
+		
+	}
 	
 	int i;
 	for (i = 0; i < 9;i++) {
@@ -200,9 +217,68 @@ void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
 		
 			if (Debug == TRUE)
 				printf("Found %s in INPUT file\n", input_arguments[i].string);
+				
+			input_arguments[i].Function(stringbuffer);
 		
 		}
 		
 	}
 
+}
+
+void Input_xyz_file(char stringbuffer[BUFFER_LENGTH]) {
+	
+	char *parameter = GetParameter(stringbuffer);
+	
+	strncpy(Filename, parameter, strlen(parameter));
+	
+}
+void Input_test_forces(char stringbuffer[BUFFER_LENGTH]) {
+	
+	char *parameter = GetParameter(stringbuffer);
+	
+}
+void Input_constant_temp(char stringbuffer[BUFFER_LENGTH]) {
+	
+	char *parameter = GetParameter(stringbuffer);
+	
+}
+void Input_tau(char stringbuffer[BUFFER_LENGTH]) {
+	
+	char *parameter = GetParameter(stringbuffer);
+	
+}
+void Input_nsteps(char stringbuffer[BUFFER_LENGTH]) {
+	
+	char *parameter = GetParameter(stringbuffer);
+	
+}
+void Input_dt(char stringbuffer[BUFFER_LENGTH]) {
+
+	char *parameter = GetParameter(stringbuffer);
+	
+}
+void Input_temp(char stringbuffer[BUFFER_LENGTH]) {
+	
+	char *parameter = GetParameter(stringbuffer);
+	
+}
+void Input_init_temp(char stringbuffer[BUFFER_LENGTH]) {
+	
+	char *parameter = GetParameter(stringbuffer);
+	
+}
+void Input_iprint(char stringbuffer[BUFFER_LENGTH]) {
+	
+	char *parameter = GetParameter(stringbuffer);
+	
+}
+
+//Assumes that immediately following the paramater type, we have the value.
+char *GetParameter(char stringbuffer[BUFFER_LENGTH]) {
+	
+	char *cpointer = strtok(stringbuffer," ");
+	cpointer       = strtok(NULL, " ");
+	
+	return cpointer;
 }
