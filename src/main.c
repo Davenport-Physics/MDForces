@@ -144,7 +144,7 @@ typedef struct {
 
 } String_T;
 
-static String_T input_arguments[9] = {
+static const String_T input_arguments[9] = {
 {"XYZ_FILE", 8},
 {"TEST_FORCES",11},
 {"CONSTANT_TEMPERATURE",20},
@@ -157,6 +157,6 @@ static String_T input_arguments[9] = {
 
 void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
 
-	
+
 
 }
