@@ -26,15 +26,16 @@
 #include <string.h>
 #include <stdlib.h>
 
-static const int BUFFER_LENGTH = 256;
-
 void ReadInputFile();
 void ParseInputString(char stringbuffer[BUFFER_LENGTH]);
 void Initialize(int argc, char *argv[]);
 void InitializeArrays(FILE *fp);
 void HandleRuntimeArguments(int argc, char *argv[]);
 
+int FindCommentLocation(char stringbuffer[BUFFER_LENGTH]);
+
 static int NumberOfAtoms = 0;
+static const int BUFFER_LENGTH = 256;
 
 static char Filename[BUFFER_LENGTH] = {'\0'};
 static char **Atoms = NULL;
@@ -183,6 +184,34 @@ static const String_T input_arguments[9] = {
 
 void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
 
+	int CommentIndex = FindCommentLocation(stringbuffer);
+	
+	//If comment leads string, simply exit this function
+	if (CommentIndex == 0)
+		return;
+	
+	int i;
+	for (i = 0; i < 9;i++) {
+	
+		if (strncasecmp(input_arguments[i].string, stringbuffer, input_arguments[i].length) == 0) {
+		
+			printf("Found %s in INPUT file", input_arguments[i].string);
+		
+		}
+		
+	}
 
+}
 
+int FindCommentLocation(char stringbuffer[BUFFER_LENGTH]) {
+
+	int i;
+	for (i = 0;i < BUFFER_LENGTH;i++) {
+	
+		if (stringbuffer[i] == '#')
+			return i;
+					
+	}
+	
+	return -1;
 }
