@@ -71,11 +71,7 @@ void ReadInputFile() {
 	fclose(fp);
 
 }
-void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
 
-
-
-}
 
 void HandleRuntimeArguments(int argc, char **argv) {
 	
@@ -141,3 +137,26 @@ void InitializeArrays(FILE *fp) {
 	
 }
 
+typedef struct {
+
+	char *string;
+	int length;
+
+} String_T;
+
+static String_T input_arguments[9] = {
+{"XYZ_FILE", 8},
+{"TEST_FORCES",11},
+{"CONSTANT_TEMPERATURE",20},
+{"TAU", 3},
+{"NTSTEPS", 7},
+{"DT", 2},
+{"TEMP", 4},
+{"INIT_TEMP", 9},
+{"IPRINT", 6}};
+
+void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
+
+	
+
+}
