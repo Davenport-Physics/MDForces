@@ -26,6 +26,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "share.h"
+
 #define BUFFER_LENGTH 256
 
 static int NumberOfAtoms = 0;
@@ -41,9 +43,6 @@ void ParseInputString(char stringbuffer[BUFFER_LENGTH]);
 void Initialize(int argc, char *argv[]);
 void InitializeArrays(FILE *fp);
 void HandleRuntimeArguments(int argc, char *argv[]);
-
-int FindCommentLocation(char stringbuffer[BUFFER_LENGTH]);
-
 
 int main(int argc, char **argv)
 {
@@ -96,6 +95,10 @@ void HandleRuntimeArguments(int argc, char **argv) {
 		if (strcasecmp(argv[i], "-f") == 0 && (i+1) < argc) {
 	
 			strncpy(Filename, argv[i+1], BUFFER_LENGTH);
+			
+		} else if (strcasecmp(argv[i], "-debug") == 0) {
+		
+			Debug = TRUE;
 			
 		}
 		
@@ -166,13 +169,6 @@ void InitializeArrays(FILE *fp) {
 	
 }
 
-typedef struct {
-
-	char *string;
-	int length;
-
-} String_T;
-
 static const String_T input_arguments[9] = {
 {"XYZ_FILE", 8},
 {"TEST_FORCES",11},
@@ -186,7 +182,12 @@ static const String_T input_arguments[9] = {
 
 void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
 
-	int CommentIndex = FindCommentLocation(stringbuffer);
+	/*
+	 * strcspn returns position within string where # is located. If
+	 * no # is found, it returns the length of the string.
+	 * 
+	 * */
+	int CommentIndex = strcspn(stringbuffer, "#");
 	
 	//If comment leads string, simply exit this function
 	if (CommentIndex == 0)
@@ -197,23 +198,11 @@ void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
 	
 		if (strncasecmp(input_arguments[i].string, stringbuffer, input_arguments[i].length) == 0) {
 		
-			printf("Found %s in INPUT file\n", input_arguments[i].string);
+			if (Debug == TRUE)
+				printf("Found %s in INPUT file\n", input_arguments[i].string);
 		
 		}
 		
 	}
 
-}
-
-int FindCommentLocation(char stringbuffer[BUFFER_LENGTH]) {
-
-	int i;
-	for (i = 0;i < BUFFER_LENGTH;i++) {
-	
-		if (stringbuffer[i] == '#')
-			return i;
-					
-	}
-	
-	return -1;
 }
