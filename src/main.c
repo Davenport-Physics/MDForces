@@ -53,6 +53,12 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+/*
+
+	Looks for a file called INPUT and calls ParseInputString
+	to parse the file line by line
+
+*/
 void ReadInputFile() {
 
 	FILE *fp = fopen("INPUT", "r");
@@ -72,6 +78,12 @@ void ReadInputFile() {
 
 }
 
+/*
+
+	Handles runtime arguments. Currently only the
+	XYZ file is handled.
+
+*/
 
 void HandleRuntimeArguments(int argc, char **argv) {
 	
@@ -87,6 +99,14 @@ void HandleRuntimeArguments(int argc, char **argv) {
 	}
 	
 }
+
+/*
+
+	Attemps to initialize all of the necessary static variables needed for
+	this program to run correctly. Will exit safely if certain conditions
+	are not met that are necessary for the program to execute correctly.
+
+*/
 
 void Initialize(int argc, char *argv[]) {
 
@@ -114,6 +134,12 @@ void Initialize(int argc, char *argv[]) {
 	fclose(fp);
 
 }
+
+/*
+
+	Initializes static pointers.
+
+*/
 
 void InitializeArrays(FILE *fp) {
 	
