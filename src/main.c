@@ -26,13 +26,17 @@
 #include <string.h>
 #include <stdlib.h>
 
-void Initialize();
+static const int BUFFER_LENGTH = 256;
+
+void ReadInputFile();
+void ParseInputString(char stringbuffer[BUFFER_LENGTH]);
+void Initialize(int argc, char *argv[]);
 void InitializeArrays(FILE *fp);
 void HandleRuntimeArguments(int argc, char *argv[]);
 
 static int NumberOfAtoms = 0;
 
-static char Filename[256] = {'\0'};
+static char Filename[BUFFER_LENGTH] = {'\0'};
 static char **Atoms = NULL;
 
 static double CubicBoxLength = 0.0f;
@@ -41,18 +45,36 @@ static double **Coordinates = NULL;
 int main(int argc, char **argv)
 {
 	
-	if (argc > 1) {
-	
-		HandleRuntimeArguments(argc, argv);
-		
-	}
-	Initialize();
-	
+	Initialize(argc, argv);
 	
 	free(Atoms);
 	free(Coordinates);
 	
 	return 0;
+}
+
+void ReadInputFile() {
+
+	FILE *fp = fopen("INPUT", "r");
+
+	if (fp == NULL) {
+
+		printf("INPUT file not found\n");
+		return;
+
+	}
+
+	char stringbuffer[BUFFER_LENGTH] = {'\0'};
+	while ((fgets(stringbuffer, BUFFER_LENGTH, fp)) != EOF)
+		ParseInputString(stringbuffer);
+
+	fclose(fp);
+
+}
+void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
+
+
+
 }
 
 void HandleRuntimeArguments(int argc, char **argv) {
@@ -62,7 +84,7 @@ void HandleRuntimeArguments(int argc, char **argv) {
 	
 		if (strcasecmp(argv[i], "-f") == 0 && (i+1) < argc) {
 	
-			strncpy(Filename, argv[i+1], 256);
+			strncpy(Filename, argv[i+1], BUFFER_LENGTH);
 			
 		}
 		
@@ -70,7 +92,12 @@ void HandleRuntimeArguments(int argc, char **argv) {
 	
 }
 
-void Initialize() {
+void Initialize(int argc, char *argv[]) {
+
+	ReadInputFile();
+
+	if (argc > 1)
+		HandleRuntimeArguments(argc, argv);
 
 	FILE *fp = fopen(Filename, "r");
 	
@@ -84,7 +111,7 @@ void Initialize() {
 	fscanf(fp,"%d", &NumberOfAtoms);
 	fscanf(fp,"%lf", &CubicBoxLength);
 	
-	printf("Number of atoms = %d and Unknown Paramater = %lf", NumberOfAtoms, CubicBoxLength);
+	printf("Number of atoms = %d and Cubic Box Length = %lf", NumberOfAtoms, CubicBoxLength);
 	
 	InitializeArrays(fp);
 	
@@ -107,7 +134,7 @@ void InitializeArrays(FILE *fp) {
 	
 	for (i = 0;i < NumberOfAtoms;i++) {
 	
-		fscanf(fp, "%s %lf %lf %lf", Atoms[i], &(Coordinates[i][0]),&(Coordinates[i][1]),&(Coordinates[i][2]));
+		fscanf(fp, "%s %lf %lf %lf", Atoms[i], &(Coordinates[i][0]), &(Coordinates[i][1]), &(Coordinates[i][2]));
 		printf("Atom %d %s with coordinates = %lf %lf %lf\n", i+1, Atoms[i], Coordinates[i][0], Coordinates[i][1], Coordinates[i][2]);
 		
 	}
