@@ -26,6 +26,16 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define BUFFER_LENGTH 256
+
+static int NumberOfAtoms = 0;
+
+static char Filename[BUFFER_LENGTH];
+static char **Atoms = NULL;
+
+static double CubicBoxLength = 0.0f;
+static double **Coordinates = NULL;
+
 void ReadInputFile();
 void ParseInputString(char stringbuffer[BUFFER_LENGTH]);
 void Initialize(int argc, char *argv[]);
@@ -34,14 +44,6 @@ void HandleRuntimeArguments(int argc, char *argv[]);
 
 int FindCommentLocation(char stringbuffer[BUFFER_LENGTH]);
 
-static int NumberOfAtoms = 0;
-static const int BUFFER_LENGTH = 256;
-
-static char Filename[BUFFER_LENGTH] = {'\0'};
-static char **Atoms = NULL;
-
-static double CubicBoxLength = 0.0f;
-static double **Coordinates = NULL;
 
 int main(int argc, char **argv)
 {
@@ -72,7 +74,7 @@ void ReadInputFile() {
 	}
 
 	char stringbuffer[BUFFER_LENGTH] = {'\0'};
-	while ((fgets(stringbuffer, BUFFER_LENGTH, fp)) != EOF)
+	while (fgets(stringbuffer, BUFFER_LENGTH, fp) != NULL)
 		ParseInputString(stringbuffer);
 
 	fclose(fp);
@@ -195,7 +197,7 @@ void ParseInputString(char stringbuffer[BUFFER_LENGTH]) {
 	
 		if (strncasecmp(input_arguments[i].string, stringbuffer, input_arguments[i].length) == 0) {
 		
-			printf("Found %s in INPUT file", input_arguments[i].string);
+			printf("Found %s in INPUT file\n", input_arguments[i].string);
 		
 		}
 		
